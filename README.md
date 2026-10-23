@@ -82,6 +82,51 @@ Every conversation is analyzed and assigned:
 
 ---
 
+## Test Data Files
+
+Two CSV files are included for testing:
+
+### `sample_data.csv`
+15 simple example conversations covering all routing categories. Good for a quick first test.
+
+### `volopay-conversation-records.csv` ⭐ Real Data
+34 real-world SpendNest sales conversations from a single day (August 21, 2026), including:
+
+| Group | Records | Description |
+|-------|---------|-------------|
+| B01–B20 | 20 calls | Short calls — voicemails and unresponsive (no transcript) |
+| C01–C10 | 10 calls | Full transcript calls — mix of outcomes |
+| M01–M14 | 14 meetings | Full meeting transcripts including partner, customer, and internal sessions |
+
+**Column mapping (auto-detected by the app):**
+
+| CSV Column | Maps To | Notes |
+|------------|---------|-------|
+| `source_id` | `source_id` | UUID — guarantees no duplicates on re-import |
+| `conversation_date` | `conversation_date` | ISO 8601 format |
+| `owner_name` | `owner` | Arun, Leela, Meera, Kiran, Dev |
+| `title` | `topic` | Short label per record |
+| `conversation_text` | `transcript` | Full text for routing analysis |
+| `outcome` | `status` | voicemail, follow_up, referred, uninterested, etc. |
+| `source_type` | `conversation_type` | call / meeting |
+
+**Expected routing results after import:**
+
+| Record | Expected Category | Expected Priority | Reason |
+|--------|------------------|------------------|--------|
+| M01 | buying_signal | high | "let us get the partner onboarding started" |
+| C08 | buying_signal | medium | Referred to decision-maker, proposal requested |
+| C07 | buying_signal | medium | Partnership discussion, follow-up agreed |
+| M03 | objection_blocker | medium | Pricing discrepancy raised by customer |
+| M04 | objection_blocker | medium | Credit vs prepaid blocker identified |
+| M07 | customer_risk | high | Multiple product bugs reported live |
+| M09 | customer_risk | high | Login broken, token expired on fresh link |
+| C01 | routine | low | Explicitly uninterested, cold call |
+| C06 | routine | low | Already automated, no need |
+| B01–B20 | needs_review | needs_review | No transcript available |
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -111,9 +156,9 @@ streamlit run app.py
 
 1. **Import Data**
    - Navigate to "Import Data" page
-   - Upload a CSV or JSON file with conversation records
-   - Preview and validate
-   - Commit the import
+   - Upload `volopay-conversation-records.csv` (34 real conversations) or `sample_data.csv` (15 simple examples)
+   - Preview and validate — all 34 records should pass
+   - Commit the import — routing runs automatically
 
 2. **View Dashboard**
    - Go to "Overview" to see activity metrics
